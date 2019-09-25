@@ -1,4 +1,4 @@
-#cython: c_string_type=str, c_string_encoding=ascii
+#cython: language_level=2, c_string_type=str, c_string_encoding=ascii
 """
 pytiff is a python wrapper for the libtiff c api written in cython. It is python 2 and 3 compatible.
 While there are some missing features, it supports reading chunks of tiled greyscale tif images as well as basic reading for color images.
@@ -1113,7 +1113,11 @@ cdef class Tiff:
     """
     cdef char* desc = ''
     err = ctiff.TIFFGetField(self.tiff_handle, tag, &desc)
-    str = <string>desc
+    if PY3:
+      py_byte_string = <bytes>desc
+      str = py_byte_string.decode()
+    else:
+      str = <string>desc
     if str == "":
       str = None
     return str, err
